@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width" />
+        <title>Equity Map</title>
+
+        <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css">
+        <link rel="stylesheet" href="src/css/main.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.css" integrity="sha256-IvM9nJf/b5l2RoebiFno92E5ONttVyaEEsdemDC6iQA=" crossorigin="anonymous">
+    </head>
+
+    <body>
+        <div id="testing">
+            <div id="helpInfo" class="card">
+                <div class="card-body">
+                    <img width="150px" src="src/img/dataLab.JPG" alt="HGAC Data Lab Icon">
+                    <h4 class="card-title">Instant Summary Map <a href="https://datalab.h-gac.com/development/EquityAdvanced/AdvancedEquity_UserGuide.pdf" target="_blank" title="Go to User Guide"><i class="far fa-question-circle"></i></a></h4>
+                    <div class="borderArea">
+                        <b>Toggle boundary layer</b>
+                        <br />
+                        <div id="layerChoice" class="btn-group btn-group-toggle" data-toggle="buttons">
+                            <label for="group" id="blockStyle" class="btn btn-secondary active">
+                                <input type="radio" name="options" value="group" data-id="Group" autocomplete="off" checked="checked">ACS Data
+                            </label>
+                            <label for="vulPop" id="vulPopStyle" class="btn btn-secondary">
+                                <input type="radio" name="options" value="vulPop" data-id="vulPop" autocomplete="off">Vulnerable Population
+                            </label>
+                            <label for="hud" id="hudStyle" class="btn btn-secondary">
+                                <input type="radio" name="options" value="hud" data-id="hud" autocomplete="off">HUD LMI
+                            </label>
+                        </div>
+                    </div>
+                    <div class="borderArea">
+                        <b>Select Field</b>
+                        <br />
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="fieldDropdown" id="fieldDropdown">
+                                <option value="total">Total Population</option>
+                                <option value="Race">Race</option>
+                                <option value="Age">Age</option>
+                                <option value="Education">Education</option>
+                                <option value="Language">Language</option>
+                                <option value="Income">Income</option>
+                                <option value="Poverty">Poverty</option>
+                                <option value="Car">Vehicle Ownership</option>
+                                <option value="Mode">Mode of Transportation</option>
+                                <option value="Travel">Travel Time to Work</option>
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="vulPicker" id="vulPicker">
+                                <option value="poverty">Poverty</option>
+                                <option value="NHNW">Non-Hispanic minorities</option>
+                                <option value="hispanic">Hispanic minorities</option>
+                                <option value="LE_prof">Limited English</option>
+                                <option value="tot_dp_hh">Disabled</option>
+                                <option value="elderly">Elderly Residents</option>
+                                <option value="auto_0_car">Owns No Vehicle</option>
+                                <option value="Fem_HH_Chd">Female Householder with Child</option>
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="hudPicker" id="hudPicker">
+                                <option value="Low">Low Income</option>
+                                <option value="Lowmod">Low & Moderate Income</option>
+                                <option value="Lmmi">Low, Moderate & Medium Income</option>
+                                <option value="Lowmoduniv">All Incomes</option>
+                                <option value="Lowmod_pct">Low & Moderate Income (%)</option>
+                            </select>
+                        </div>
+                        <br />
+                        <b id="yearLabel">Select Year</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="yearDropdown" id="yearDropdown">
+                                <option value="1980">1980</option>
+                                <option value="1990">1990</option>
+                                <option value="2000">2000</option>
+                                <option value="2010">2010</option>
+                                <option value="current" selected>2018</option>
+                            </select>
+                        </div>
+                        <b id="ageLabel">Select Age Group</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="ageDropdown" id="ageDropdown">
+                                <option value="age1">Under 5</option>
+                                <option value="age2">5 to 17</option>
+                                <option value="age3">18 to 34</option>
+                                <option value="age4">35 to 64</option>
+                                <option value="age5">65 and Older</option>
+                            </select>
+                        </div>
+                        <b id="earningLabel">Select Household Income</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="earningDropdown" id="earningDropdown">
+                                <option value="earn1">Below $25K</option>
+                                <option value="earn2">$25K to $50K</option>
+                                <option value="earn3">$50K to $100K</option>
+                                <option value="earn4">Above $100K</option>
+                            </select>
+                        </div>
+                        <b id="raceLabel">Select Race</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="raceDropdown" id="raceDropdown">
+                                <option value="race1">White</option>
+                                <option value="race2">Black</option>
+                                <option value="race3">Hispanic</option>
+                                <option value="race4">Asian</option>
+                                <option value="race5">Other</option>
+                            </select>
+                        </div>
+                        <b id="eduLabel">Select Education Level</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="eduDropdown" id="eduDropdown">
+                                <option value="edu1">Less than High School</option>
+                                <option value="edu2">High School or Equivalent</option>
+                                <option value="edu3">Associate Degree</option>
+                                <option value="edu4">Bachelor's Degree</option>
+                                <option value="edu5">Graduate Degree</option>
+                            </select>
+                        </div>
+                        <b id="langLabel">Select Type</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="langDropdown" id="langDropdown">
+                                <option value="lang1">English Not Spoken</option>
+                                <option value="lang2">English Not Spoken Well</option>
+                                <option value="lang3">English Spoken Well</option>
+                                <option value="lang4">English Spoken Very Well</option>
+                                <option value="lang5">English Only Spoken</option>
+                            </select>
+                        </div>
+                        <b id="carLabel">Select Ownership</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="carDropdown" id="carDropdown">
+                                <option value="car0">Owns No Vehicle</option>
+                                <option value="car1">Owns One Vehicle</option>
+                                <option value="car2">Owns Two Vehicles</option>
+                                <option value="car3">Owns Three Vehicles</option>
+                                <option value="car4">Own Four or More Vehicles</option>
+                            </select>
+                        </div>
+                        <b id="modeLabel">Select Mode</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="modeDropdown" id="modeDropdown">
+                                <option value="mode1">Carpool</option>
+                                <option value="mode2">Drove Alone</option>
+                                <option value="mode3">Pedestrian/Bike</option>
+                                <option value="mode4">Teleworks</option>
+                                <option value="mode5">Transit</option>
+                                <option value="mode6">Other</option>
+                            </select>
+                        </div>
+                        <b id="timeLabel">Select Time</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="timeDropdown" id="timeDropdown">
+                                <option value="time1">Under 5 Mins</option>
+                                <option value="time2">5 to 15 Mins</option>
+                                <option value="time3">15 to 30 Mins</option>
+                                <option value="time4">30 to 60 Mins</option>
+                                <option value="time5">60 or More Mins</option>
+                            </select>
+                        </div>
+                        <b id="povertyLabel">Select Poverty Stat</b>
+                        <div class="dropdown">
+                            <select data-live-search="true" class="selectpicker" name="povertyDropdown" id="povertyDropdown">
+                                <option value="pov1">Households Under Poverty Rate</option>
+                                <option value="pov2">Poverty Rate</option>
+                                <option value="pov3">Unemployment Rate</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="viewDiv"></div>
+            <div id="reportModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="reportTile" class="modal-title"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="Job-tab" data-toggle="tab" href="#Job" role="tab" aria-controls="Job" aria-selected="true">Total Population</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="Attributes-tab" data-toggle="tab" href="#Attributes" role="tab" aria-controls="Attributes" aria-selected="false">Demographic Attributes</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="JobTypes-tab" data-toggle="tab" href="#JobTypes" role="tab" aria-controls="JobTypes" aria-selected="false">Travel Attributes</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="Job" role="tabpanel" aria-labelledby="Job-tab">
+                                    <br />
+                                </div>
+                                <div class="tab-pane fade" id="Attributes" role="tabpanel" aria-labelledby="Attributes-tab">
+                                    <br />
+                                </div>
+                                <div class="tab-pane fade" id="JobTypes" role="tabpanel" aria-labelledby="JobTypes-tab">
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="hudReportModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="hudReportTile" class="modal-title"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="hudAttributes-tab" data-toggle="tab" href="#hudAttributes" role="tab" aria-controls="Attributes" aria-selected="true">HUD LMIS Attributes</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="hudAttributes" role="tabpanel" aria-labelledby="hudAttributes-tab">
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="vulReportModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 id="vulReportTile" class="modal-title"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="vulAttributes-tab" data-toggle="tab" href="#vulAttributes" role="tab" aria-controls="Attributes" aria-selected="true">Vulnerable Population Attributes</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="vulAttributes" role="tabpanel" aria-labelledby="vulAttributes-tab">
+                                    <br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://js.arcgis.com/4.12"></script>
+        <script src="src/js/main.js"></script>
+    </body>
+</html>
